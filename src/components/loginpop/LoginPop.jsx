@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./LoginPop.css";
+import { assets } from "../../assets/assets";
 
 const LoginPop = ({ setShowLogin }) => {
   const [currState, setCurrState] = useState("Login");
@@ -9,7 +10,11 @@ const LoginPop = ({ setShowLogin }) => {
       <form className="form-container">
         <div className="login-title">
           <h2>{currState}</h2>
-          <img onClick={() => setShowLogin(false)} src="" alt="" />
+          <img
+            onClick={() => setShowLogin(false)}
+            src={assets.cross_icon}
+            alt=""
+          />
         </div>
         <div className="login-input">
           {currState === "Login" ? (

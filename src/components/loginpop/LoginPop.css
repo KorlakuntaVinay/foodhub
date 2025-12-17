@@ -24,6 +24,11 @@
   align-items: center;
   color: black;
 }
+.login-title img{
+  width: 16px;
+  cursor: pointer;
+}
+
 .login-input{
   display: flex;
   flex-direction: column;
@@ -42,5 +47,19 @@
   color: white;
   background-color: tomato;
   font-size: 15px;
+  cursor:pointer;
+}
+.login-condition{
+  display: flex;
+  align-items: start;
+  gap:8px;
+  margin-top: -15px;
+}
+.login-condition input{
+  margin-top: 5px;
+}
+.login-pop p span{
+  color: tomato;
+  font-weight: 500;
   cursor:pointer;
 }

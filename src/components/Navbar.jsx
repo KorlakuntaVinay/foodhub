@@ -1,12 +1,21 @@
 import React, { useState } from "react";
+import { NavLink } from "react-router-dom";
 import { assets } from "../assets/assets";
 
 const Navbar = ({ setShowLogin }) => {
-  const [menu, setMenu] = useState("Menu");
+  const [menu, setMenu] = useState("home");
   const [open, setOpen] = useState(false);
+
+  const linkClass = ({ isActive }) =>
+    `cursor-pointer pb-1 ${
+      isActive ? "text-black border-b-2 border-orange-500" : "text-gray-500"
+    }`;
+
   return (
     <div className="w-full px-4 py-4 flex justify-between items-center md:px-8">
-      <img src={assets.foodhub} alt="" className="h-10 w-10 rounded-3xl" />
+      <NavLink to="/">
+        <img src={assets.foodhub} alt="" className="h-10 w-10 rounded-3xl" />
+      </NavLink>
       <ul className="hidden md:flex gap-5 text-md text-gray-500">
         <ul className="flex md:flex gap-5 text-md list-none text-gray-500">
           <li
@@ -15,7 +24,9 @@ const Navbar = ({ setShowLogin }) => {
               menu === "Home" ? "text-black border-b-2 border-orange-500" : ""
             }`}
           >
-            Home
+            <NavLink to="/" className={linkClass}>
+              Home
+            </NavLink>
           </li>
 
           <li
@@ -24,7 +35,9 @@ const Navbar = ({ setShowLogin }) => {
               menu === "Menu" ? "text-black border-b-2 border-orange-500" : ""
             }`}
           >
-            Menu
+            <NavLink to="/foodlist" className={linkClass}>
+              Menu
+            </NavLink>
           </li>
 
           <li
@@ -35,7 +48,9 @@ const Navbar = ({ setShowLogin }) => {
                 : ""
             }`}
           >
-            Contact us
+            <NavLink to="/contact" className={linkClass}>
+              Contact us
+            </NavLink>
           </li>
         </ul>
       </ul>
@@ -48,7 +63,9 @@ const Navbar = ({ setShowLogin }) => {
               setOpen(false);
             }}
           >
-            Home
+            <NavLink to="/" onClick={() => setOpen(false)}>
+              Home
+            </NavLink>
           </li>
           <li
             onClick={() => {
@@ -56,7 +73,9 @@ const Navbar = ({ setShowLogin }) => {
               setOpen(false);
             }}
           >
-            Menu
+            <NavLink to="/foodlist" onClick={() => setOpen(false)}>
+              Menu
+            </NavLink>
           </li>
           <li
             onClick={() => {
@@ -64,7 +83,9 @@ const Navbar = ({ setShowLogin }) => {
               setOpen(false);
             }}
           >
-            Contact us
+            <NavLink to="/contact" onClick={() => setOpen(false)}>
+              Contact us
+            </NavLink>
           </li>
         </ul>
       )}
