@@ -2,8 +2,10 @@ import React from "react";
 import header_img from "../assets/header_img.png";
 import { NavLink } from "react-router-dom";
 import Footer from "../components/Footer";
+import { useAuth } from "../Context/AuthContext";
 
-const Home = () => {
+const Home = ({ setShowLogin }) => {
+  const { user } = useAuth();
   return (
     <div>
       <div
@@ -29,7 +31,7 @@ const Home = () => {
             Order your favourite food here
           </h2>
 
-          <p className="mt-3 text-sm sm:text-base leading-relaxed text-gray-200">
+          <p className="mt-3 text-sm sm:text-base leading-relaxed text-white">
             Choose from a diverse menu featuring a delectable array of dishes
             crafted with the finest ingredients and culinary expertise. Our
             mission is to satisfy your cravings and elevate your dining
@@ -37,7 +39,13 @@ const Home = () => {
           </p>
 
           <NavLink
-            to="/foodlist"
+            to={user ? "/FoodList" : "#"}
+            onClick={(e) => {
+              if (!user) {
+                e.preventDefault();
+                setShowLogin(true);
+              }
+            }}
             className="
               inline-block mt-5
               bg-amber-50 px-5 py-2 sm:px-6 sm:py-2.5

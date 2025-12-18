@@ -1,10 +1,23 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 import { assets } from "../assets/assets";
 
 const Navbar = ({ setShowLogin }) => {
   const [menu, setMenu] = useState("home");
   const [open, setOpen] = useState(false);
+
+  const { user, logout } = useAuth(""); // get user state
+  const navigate = useNavigate();
+
+  const handleAuthClick = () => {
+    if (user) {
+      logout();
+      navigate("/"); // redirect to home
+    } else {
+      setShowLogin(true); // show login popup
+    }
+  };
 
   const linkClass = ({ isActive }) =>
     `cursor-pointer pb-1 ${
@@ -93,13 +106,16 @@ const Navbar = ({ setShowLogin }) => {
       <button className="md:hidden text-2xl" onClick={() => setOpen(!open)}>
         ☰
       </button>
-      <div className="flex items-center gap-8">
+      <div className="flex items-center gap-4">
         <img src={assets.search_icon} alt="" />
+
+        {user && <span className="text-gray-700 font-medium">Hi,Vinay</span>}
+
         <button
           className="px-[30px] py-[10py] text-base bg-transparent border border-solid transition rounded-4xl cursor-pointer hover:bg-amber-200"
-          onClick={() => setShowLogin(true)}
+          onClick={handleAuthClick}
         >
-          sign in
+          {user ? "Sign Out" : "Sign In"}
         </button>
       </div>
     </div>

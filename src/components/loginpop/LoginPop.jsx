@@ -1,13 +1,41 @@
 import React, { useState } from "react";
 import "./LoginPop.css";
 import { assets } from "../../assets/assets";
+import { useAuth } from "../../Context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const LoginPop = ({ setShowLogin }) => {
   const [currState, setCurrState] = useState("Login");
+  const [name, setName] = useState("");
+
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  {
+    currState !== "Login" && (
+      <input
+        type="text"
+        placeholder="Your Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+      />
+    );
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // fake login (replace with API later)
+    login({ name: currState === "Login" ? "User" : name.trim(name) });
+
+    setShowLogin(false);
+    navigate("/foodlist");
+  };
 
   return (
     <div className="login-pop">
-      <form className="form-container">
+      <form className="form-container" onSubmit={handleSubmit}>
         <div className="login-title">
           <h2>{currState}</h2>
           <img

@@ -5,6 +5,7 @@ import FoodList from "./pages/FoodList";
 import { useState } from "react";
 import LoginPop from "./components/loginpop/LoginPop";
 import Contact from "./pages/Contact";
+import PrivateRoute from "./routes/PrivateRoute";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -15,8 +16,15 @@ function App() {
       <Navbar setShowLogin={setShowLogin} />
 
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/foodlist" element={<FoodList />} />
+        <Route path="/" element={<Home setShowLogin={setShowLogin} />} />
+        <Route
+          path="/foodlist"
+          element={
+            <PrivateRoute>
+              <FoodList />{" "}
+            </PrivateRoute>
+          }
+        />
         <Route path="/contact" element={<Contact />} />
       </Routes>
     </div>
