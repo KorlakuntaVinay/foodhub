@@ -4,7 +4,7 @@ import { useAuth } from "../Context/AuthContext";
 import { assets } from "../assets/assets";
 
 const Navbar = ({ setShowLogin }) => {
-  const [menu, setMenu] = useState("home");
+  const [menu, setMenu] = useState("menu");
   const [open, setOpen] = useState(false);
 
   const { user, logout } = useAuth(""); // get user state
@@ -33,9 +33,13 @@ const Navbar = ({ setShowLogin }) => {
         <ul className="flex md:flex gap-5 text-md list-none text-gray-500">
           <li
             onClick={() => setMenu("Home")}
-            className={`cursor-pointer pb-1 ${
-              menu === "Home" ? "text-black border-b-2 border-orange-500" : ""
-            }`}
+            className={({ isActive }) =>
+              `cursor-pointer pb-1 ${
+                isActive
+                  ? "text-black border-b-2 border-orange-500"
+                  : "text-gray-500"
+              }`
+            }
           >
             <NavLink to="/" className={linkClass}>
               Home
@@ -44,22 +48,37 @@ const Navbar = ({ setShowLogin }) => {
 
           <li
             onClick={() => setMenu("Menu")}
-            className={`cursor-pointer pb-1 ${
-              menu === "Menu" ? "text-black border-b-2 border-orange-500" : ""
-            }`}
+            className={({ isActive }) =>
+              `cursor-pointer pb-1 ${
+                isActive
+                  ? "text-black border-b-2 border-orange-500"
+                  : "text-gray-500"
+              }`
+            }
           >
-            <NavLink to="/foodlist" className={linkClass}>
+            <NavLink
+              to={user ? "/foodlist" : "#"}
+              className={linkClass}
+              onClick={(e) => {
+                if (!user) {
+                  e.preventDefault(); // prevent navigation
+                  alert("Please sign in"); // show alert
+                }
+              }}
+            >
               Menu
             </NavLink>
           </li>
 
           <li
             onClick={() => setMenu("Contact-us")}
-            className={`cursor-pointer pb-1 ${
-              menu === "Contact-us"
-                ? "text-black border-b-2 border-orange-500"
-                : ""
-            }`}
+            className={({ isActive }) =>
+              `cursor-pointer pb-1 ${
+                isActive
+                  ? "text-black border-b-2 border-orange-500"
+                  : "text-gray-500"
+              }`
+            }
           >
             <NavLink to="/contact" className={linkClass}>
               Contact us
@@ -86,7 +105,16 @@ const Navbar = ({ setShowLogin }) => {
               setOpen(false);
             }}
           >
-            <NavLink to="/foodlist" onClick={() => setOpen(false)}>
+            <NavLink
+              to={user ? "/foodlist" : "#"}
+              onClick={(e) => {
+                setOpen(false); // close mobile menu
+                if (!user) {
+                  e.preventDefault();
+                  alert("Please sign in");
+                }
+              }}
+            >
               Menu
             </NavLink>
           </li>

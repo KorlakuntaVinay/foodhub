@@ -9,7 +9,6 @@ import FoodCard from "../components/FoodCard.jsx";
 import Filters from "../components/Filters.jsx";
 import Pagination from "../components/Pagination.jsx";
 import Modal from "../components/Model.jsx";
-import Footer from "../components/Footer.jsx";
 
 export default function FoodList() {
   const [meals, setMeals] = useState([]);
@@ -84,7 +83,6 @@ export default function FoodList() {
       <Pagination total={totalPages} page={page} setPage={setPage} />
 
       <Modal item={modal} close={closeModal} />
-      <Footer />
     </>
   );
 }

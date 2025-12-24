@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+/*import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import FoodList from "./pages/FoodList";
@@ -28,6 +28,36 @@ function App() {
         <Route path="/contact" element={<Contact />} />
       </Routes>
     </div>
+  );
+}
+
+export default App;*/
+
+import { Routes, Route } from "react-router-dom";
+import Layout from "./Layout/Layin";
+
+import Home from "./pages/Home";
+import FoodList from "./pages/FoodList";
+
+import Contact from "./pages/Contact";
+import PrivateRoute from "./routes/PrivateRoute";
+
+function App() {
+  return (
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/foodlist"
+          element={
+            <PrivateRoute>
+              <FoodList />{" "}
+            </PrivateRoute>
+          }
+        />
+        <Route path="/contact" element={<Contact />} />
+      </Route>
+    </Routes>
   );
 }
 
