@@ -1,63 +1,60 @@
-/*import { Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
-import FoodList from "./pages/FoodList";
-import { useState } from "react";
-import LoginPop from "./components/loginpop/LoginPop";
-import Contact from "./pages/Contact";
-import PrivateRoute from "./routes/PrivateRoute";
-
-function App() {
-  const [showLogin, setShowLogin] = useState(false);
-
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {showLogin && <LoginPop setShowLogin={setShowLogin} />}
-      <Navbar setShowLogin={setShowLogin} />
-
-      <Routes>
-        <Route path="/" element={<Home setShowLogin={setShowLogin} />} />
-        <Route
-          path="/foodlist"
-          element={
-            <PrivateRoute>
-              <FoodList />{" "}
-            </PrivateRoute>
-          }
-        />
-        <Route path="/contact" element={<Contact />} />
-      </Routes>
-    </div>
-  );
-}
-
-export default App;*/
-
 import { Routes, Route } from "react-router-dom";
 import Layout from "./Layout/Layin";
+import { Toaster } from "react-hot-toast";
 
 import Home from "./pages/Home";
 import FoodList from "./pages/FoodList";
-
+import Profile from "./pages/profile";
 import Contact from "./pages/Contact";
 import PrivateRoute from "./routes/PrivateRoute";
+import LoginPop from "./components/loginpop/LoginPop";
+import AdminUsers from "./pages/adminusers";
+import AdminRoute from "./routes/AdminRoute";
+import AdminDashboard from "./pages/AdminDashboard";
+import ErrorBoundary from "./components/ErrorBoundary";
 
+import { useDispatch } from "react-redux";
+import Cart from "./pages/cart";
 function App() {
+  const dispatch = useDispatch();
+  const data = [
+    { _id: "1", name: "Sandeep", email: "sandeep@gmail.com" },
+    { _id: "2", name: "Anita", email: "anita@gmail.com" },
+    { _id: "3", name: "Kiran", email: "kiran@gmail.com" },
+  ];
+
+  dispatch({ type: "FETCH_USERS_SUCCESS", payload: data });
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
+    <>
+      <Toaster position="top-right" reverseOrder={false} />
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/sign-in" element={<LoginPop />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/cart" element={<Cart />} />
+
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/:userId/foodlist"
+            element={
+              <PrivateRoute>
+                <FoodList />{" "}
+              </PrivateRoute>
+            }
+          />
+          <Route path="/contact" element={<Contact />} />
+        </Route>
         <Route
-          path="/foodlist"
+          path="/admin/users"
           element={
-            <PrivateRoute>
-              <FoodList />{" "}
-            </PrivateRoute>
+            <AdminRoute>
+              <AdminUsers />
+            </AdminRoute>
           }
         />
-        <Route path="/contact" element={<Contact />} />
-      </Route>
-    </Routes>
+      </Routes>
+    </>
   );
 }
 

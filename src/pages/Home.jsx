@@ -5,6 +5,7 @@ import { useAuth } from "../Context/AuthContext";
 
 const Home = ({ setShowLogin }) => {
   const { user } = useAuth();
+
   return (
     <div>
       <div
