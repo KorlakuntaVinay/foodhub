@@ -15,6 +15,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 
 import { useDispatch } from "react-redux";
 import Cart from "./pages/cart";
+import PlaceOrder from "./pages/PlaceOrder";
 function App() {
   const dispatch = useDispatch();
   const data = [
@@ -33,6 +34,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/placeorder" element={<PlaceOrder />} />
 
           <Route path="/" element={<Home />} />
           <Route

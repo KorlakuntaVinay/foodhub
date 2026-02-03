@@ -1,173 +1,319 @@
-// import { useEffect, useState } from "react";
-// import {
-//   getAllMeals,
-//   getAreas,
-//   getMealById,
-//   getMealsByArea,
-// } from "../services/api";
-// import FoodCard from "../components/FoodCard.jsx";
-// import Filters from "../components/Filters.jsx";
-// import Pagination from "../components/Pagination.jsx";
-// import Modal from "../components/Model.jsx";
-// import { useParams } from "react-router-dom";
+// import { useEffect, useState, useMemo } from "react";
+// import { getAllFoods } from "../services/foodapi";
+// import FoodCard from "../components/FoodCard";
+// import Filters from "../components/Filters";
+// import Pagination from "../components/Pagination";
+// import Model from "../components/Model";
 
 // export default function FoodList() {
-//   const [meals, setMeals] = useState([]);
+//   const [foods, setFoods] = useState([]);
+//   const [error, setError] = useState("");
+//   const [selectedArea, setSelectedArea] = useState("");
 //   const [areas, setAreas] = useState([]);
-//   const [filtered, setFiltered] = useState([]);
-//   const [area, setArea] = useState("");
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [modalFood, setModalFood] = useState(null);
 //   const [sortType, setSortType] = useState("");
-//   const [page, setPage] = useState(1);
-//   const [modal, setModal] = useState(null);
 
-//   const limit = 8;
+//   const foodsPerPage = 8;
 
-//   const { userId } = useParams();
-//   console.log(userId); // "123"
-
+//   // Fetch foods once
 //   useEffect(() => {
-//     getAllMeals().then((res) => {
-//       setMeals(res.data.meals);
-//       setFiltered(res.data.meals);
-//     });
+//     const fetchData = async () => {
+//       try {
+//         const res = await getAllFoods();
+//         const data = res.data.data || [];
+//         setFoods(data);
 
-//     getAreas().then((res) => setAreas(res.data.meals));
+//         const uniqueAreas = [...new Set(data.map((f) => f.area))];
+//         setAreas(uniqueAreas);
+//       } catch (err) {
+//         setError("Failed to load foods");
+//         console.error(err);
+//       }
+//     };
+
+//     fetchData();
 //   }, []);
 
-//   useEffect(() => {
-//     if (area) {
-//       getMealsByArea(area).then((res) => {
-//         setFiltered(res.data.meals);
-//         setPage(1);
-//       });
-//     } else {
-//       setFiltered(meals);
+//   // Filtered and sorted foods
+//   const filteredAndSortedFoods = useMemo(() => {
+//     let result = [...foods];
+
+//     // Filter by area
+//     if (selectedArea) {
+//       result = result.filter((f) => f.area === selectedArea);
 //     }
-//   }, [area]);
 
-//   const openModal = (id) => {
-//     getMealById(id).then((res) => setModal(res.data.meals[0]));
-//   };
+//     // Sort by name
+//     if (sortType === "asc") {
+//       result.sort((a, b) => a.name.localeCompare(b.name));
+//     } else if (sortType === "desc") {
+//       result.sort((a, b) => b.name.localeCompare(a.name));
+//     }
 
-//   const closeModal = () => setModal(null);
+//     return result;
+//   }, [foods, selectedArea, sortType]);
 
-//   const totalPages = Math.ceil(filtered.length / limit);
-//   const sorted = [...filtered];
+//   // Pagination
+//   const indexOfLast = currentPage * foodsPerPage;
+//   const indexOfFirst = indexOfLast - foodsPerPage;
+//   const currentFoods = filteredAndSortedFoods.slice(indexOfFirst, indexOfLast);
+//   const totalPages = Math.ceil(filteredAndSortedFoods.length / foodsPerPage);
 
-//   if (sortType === "asc") {
-//     sorted.sort((a, b) => a.strMeal.localeCompare(b.strMeal));
-//   }
-
-//   const paginated = sorted.slice((page - 1) * limit, page * limit);
-
+//   const handlePageChange = (page) => setCurrentPage(page);
 //   const clearFilters = () => {
-//     setArea("");
+//     setSelectedArea("");
 //     setSortType("");
-//     setFiltered("");
-//     setPage(1);
+//     setCurrentPage(1);
 //   };
+
+//   if (error)
+//     return (
+//       <div className="text-center text-red-500 font-semibold">{error}</div>
+//     );
 
 //   return (
-//     <>
+//     <div className="w-[95%] mx-auto px-4 py-8">
 //       <Filters
 //         areas={areas}
-//         setArea={setArea}
+//         selectedArea={selectedArea}
+//         setSelectedArea={setSelectedArea}
 //         sortType={sortType}
 //         setSortType={setSortType}
 //         clearFilters={clearFilters}
-//         area={area}
 //       />
 
-//       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-//         {paginated.map((item) => (
-//           <FoodCard key={item.idMeal} item={item} openModal={openModal} />
-//         ))}
-//       </div>
+//       {currentFoods.length === 0 ? (
+//         <p className="text-center text-gray-500">No foods found</p>
+//       ) : (
+//         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+//           {currentFoods.map((food) => (
+//             <FoodCard
+//               key={food._id || food.foodId}
+//               food={food}
+//               openModal={() => setModalFood(food)}
+//             />
+//           ))}
+//         </div>
+//       )}
 
-//       <Pagination total={totalPages} page={page} setPage={setPage} />
+//       <Pagination
+//         currentPage={currentPage}
+//         totalPages={totalPages}
+//         onPageChange={handlePageChange}
+//       />
 
-//       <Modal item={modal} close={closeModal} />
-//     </>
+//       <Model
+//         food={modalFood}
+//         isOpen={!!modalFood}
+//         onClose={() => setModalFood(null)}
+//       />
+//     </div>
 //   );
 // }
 
-import { useEffect, useState } from "react";
-import FoodCard from "../components/FoodCard.jsx";
-import Filters from "../components/Filters.jsx";
-import Pagination from "../components/Pagination.jsx";
-import Modal from "../components/Model.jsx";
-import { useFood } from "../Context/FoodContext";
+import { useEffect, useState, useMemo } from "react";
+import { getAllFoods } from "../services/foodapi";
+import FoodCard from "../components/FoodCard";
+import Filters from "../components/Filters";
+import Pagination from "../components/Pagination";
+import Model from "../components/Model";
+import { useAuth } from "../Context/AuthContext";
+import {
+  getCartAPI,
+  addToCart as addCartAPI,
+  removeCartItem as removeCartAPI,
+} from "../services/cartapi";
+import toast from "react-hot-toast";
 
 export default function FoodList() {
-  const { meals, loading, fetchMealsByArea, getFullMeal } = useFood();
+  const { user, token, isAuthenticated } = useAuth();
 
+  const [foods, setFoods] = useState([]);
+  const [cartItems, setCartItems] = useState({});
+  const [error, setError] = useState("");
+  const [selectedArea, setSelectedArea] = useState("");
   const [areas, setAreas] = useState([]);
-  const [area, setArea] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [modalFood, setModalFood] = useState(null);
   const [sortType, setSortType] = useState("");
-  const [page, setPage] = useState(1);
-  const [modal, setModal] = useState(null);
 
-  const limit = 8;
+  const foodsPerPage = 8;
 
+  /* ================= FETCH FOODS ================= */
   useEffect(() => {
-    import("../services/api").then(({ getAreas }) => {
-      getAreas().then((res) => setAreas(res.data.meals || []));
-    });
+    const fetchData = async () => {
+      try {
+        const res = await getAllFoods();
+        const data = res.data.data || [];
+        setFoods(data);
+
+        const uniqueAreas = [...new Set(data.map((f) => f.area))];
+        setAreas(uniqueAreas);
+      } catch (err) {
+        setError("Failed to load foods");
+        console.error(err);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  /*Fetch meals when area changes*/
+  /* ================= FETCH CART ================= */
   useEffect(() => {
-    fetchMealsByArea(area);
-    setPage(1);
-  }, [area]);
+    const fetchCart = async () => {
+      if (!user?.id || !token) return;
 
-  const sortedMeals = [...meals];
-  if (sortType === "asc") {
-    sortedMeals.sort((a, b) => a.strMeal.localeCompare(b.strMeal));
-  }
+      try {
+        const data = await getCartAPI(user.id, token);
+        const itemsArray = data?.items || [];
 
-  const totalPages = Math.ceil(sortedMeals.length / limit);
-  const paginatedMeals = sortedMeals.slice((page - 1) * limit, page * limit);
+        const cartObj = {};
+        itemsArray.forEach((item) => {
+          cartObj[item.foodId] = {
+            quantity: item.quantity,
+            ...item.food,
+          };
+        });
 
-  const openModal = async (idMeal) => {
-    const meal = await getFullMeal(idMeal);
-    setModal(meal);
+        setCartItems(cartObj);
+      } catch (err) {
+        console.error("Failed to fetch cart:", err);
+      }
+    };
+
+    fetchCart();
+  }, [user, token]);
+
+  /* ================= ADD TO CART ================= */
+  const addToCart = async (food) => {
+    if (!isAuthenticated || !user?.id || !token) {
+      toast.error("Please log in to add items to your cart");
+      return;
+    }
+
+    const foodId = food._id || food.food?._id;
+    if (!foodId) return;
+
+    try {
+      await addCartAPI({ foodId, userId: user.id, quantity: 1 }, token);
+
+      setCartItems((prev) => ({
+        ...prev,
+        [foodId]: {
+          ...food,
+          quantity: (prev[foodId]?.quantity || 0) + 1,
+        },
+      }));
+
+      toast.success("Added to cart");
+    } catch (err) {
+      console.error("Add to cart failed:", err);
+      toast.error("Failed to add item");
+    }
   };
 
-  const closeModal = () => setModal(null);
+  /* ================= REMOVE FROM CART ================= */
+  const removeFromCart = async (foodId) => {
+    if (!isAuthenticated || !token || !foodId) return;
 
+    try {
+      await removeCartAPI(foodId, token);
+
+      setCartItems((prev) => {
+        const updated = { ...prev };
+        if (!updated[foodId]) return prev;
+
+        if (updated[foodId]?.quantity <= 1) {
+          delete updated[foodId];
+        } else {
+          updated[foodId] = {
+            ...updated[foodId],
+            quantity: updated[foodId].quantity - 1,
+          };
+        }
+
+        return updated;
+      });
+
+      toast.success("Removed from cart");
+    } catch (err) {
+      console.error("Remove from cart failed:", err);
+      toast.error("Failed to remove item");
+    }
+  };
+
+  /* ================= FILTER + SORT ================= */
+  const filteredAndSortedFoods = useMemo(() => {
+    let result = [...foods];
+
+    if (selectedArea) result = result.filter((f) => f.area === selectedArea);
+
+    if (sortType === "asc") result.sort((a, b) => a.name.localeCompare(b.name));
+    else if (sortType === "desc")
+      result.sort((a, b) => b.name.localeCompare(a.name));
+
+    return result;
+  }, [foods, selectedArea, sortType]);
+
+  /* ================= PAGINATION ================= */
+  const indexOfLast = currentPage * foodsPerPage;
+  const indexOfFirst = indexOfLast - foodsPerPage;
+  const currentFoods = filteredAndSortedFoods.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(filteredAndSortedFoods.length / foodsPerPage);
+
+  const handlePageChange = (page) => setCurrentPage(page);
   const clearFilters = () => {
-    setArea("");
+    setSelectedArea("");
     setSortType("");
-    setPage(1);
+    setCurrentPage(1);
   };
 
-  if (loading) {
-    return <p className="text-center p-6">Loading meals...</p>;
-  }
+  if (error)
+    return (
+      <div className="text-center text-red-500 font-semibold">{error}</div>
+    );
 
+  /* ================= UI ================= */
   return (
-    <>
+    <div className="w-[95%] mx-auto px-4 py-8">
       <Filters
         areas={areas}
-        setArea={setArea}
+        selectedArea={selectedArea}
+        setSelectedArea={setSelectedArea}
         sortType={sortType}
         setSortType={setSortType}
         clearFilters={clearFilters}
-        area={area}
       />
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-        {paginatedMeals.map((item) => (
-          <FoodCard key={item.idMeal} item={item} openModal={openModal} />
-        ))}
-      </div>
-
-      {totalPages > 1 && (
-        <Pagination total={totalPages} page={page} setPage={setPage} />
+      {currentFoods.length === 0 ? (
+        <p className="text-center text-gray-500">No foods found</p>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+          {currentFoods.map((food) => (
+            <FoodCard
+              key={food._id || food.foodId}
+              food={food}
+              openModal={() => setModalFood(food)}
+              cartItems={cartItems} // ✅ pass cart state
+              addToCart={addToCart} // ✅ pass add function
+              removeFromCart={removeFromCart} // ✅ pass remove function
+            />
+          ))}
+        </div>
       )}
 
-      <Modal item={modal} close={closeModal} />
-    </>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+
+      <Model
+        food={modalFood}
+        isOpen={!!modalFood}
+        onClose={() => setModalFood(null)}
+      />
+    </div>
   );
 }

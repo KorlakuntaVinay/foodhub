@@ -1,117 +1,197 @@
-// import { useState } from "react";
+// import { useMemo, useState } from "react";
 // import { assets } from "../assets/assets";
-// import { useCart } from "../Context/CartContext";
+// import { useAuth } from "../Context/AuthContext";
 
-// const FoodCard = ({ item, openModal }) => {
-//   const { cartItems, addToCart, removeFromCart } = useCart();
-//   const Count = cartItems[item.idMeal] || 0;
+// export default function FoodCard({
+//   food,
+//   openModal,
+//   cartItems,
+//   addToCart,
+//   removeFromCart,
+// }) {
+//   const { user } = useAuth();
+//   const [loading, setLoading] = useState(false);
+
+//   // stable rating
+//   const rating = useMemo(() => {
+//     return (Math.random() * 2.5 + 2.5).toFixed(1);
+//   }, []);
+
+//   // ✅ backend-synced count
+//   const count = cartItems?.[food._id]?.quantity || 0;
+
+//   const increment = async () => {
+//     if (!user) return alert("Please login first");
+
+//     try {
+//       setLoading(true);
+//       await addToCart(food._id);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const decrement = async () => {
+//     if (count === 0) return;
+
+//     try {
+//       setLoading(true);
+//       await removeFromCart(food._id);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
 //   return (
-//     <div className="p-3   shadow hover:scale-105 transition cursor-pointer rounded-xl sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+//     <div className="p-3 shadow hover:scale-105 transition rounded-xl">
 //       <img
-//         src={item.strMealThumb}
-//         className=" w-full h-80 object-cover rounded-xl sm:h-48 lg:h-56"
-//         onClick={() => openModal(item.idMeal)}
+//         src={food.image}
+//         alt={food.name}
+//         className="w-full h-80 object-cover rounded-xl sm:h-48 lg:h-56 cursor-pointer"
+//         onClick={openModal}
 //       />
-//       <div className="w-full px-4 py-4 flex justify-between items-center md:px-8">
-//         <div className="justify-between items-row">
-//           <h2 className="font-medium  mask-type-alpha text-xl mt-2 sm:text-base">
-//             {item.strMeal}
-//           </h2>
-//           <p className="text-sm ">
-//             ⭐ {(Math.floor(Math.random() * 9) + 2) / 2}{" "}
-//           </p>
-//           <span>{item.strMeal}</span>
+
+//       <div className="flex justify-between items-center mt-4 px-2">
+//         <div>
+//           <h2 className="font-medium text-lg">{food.name}</h2>
+//           <p className="text-sm">⭐ {rating}</p>
+//           <span className="text-green-600 font-semibold">₹{food.price}</span>
 //         </div>
-//         <div className="justify-between ">
-//           <div className="  flex justify-between items-center gap-2 ">
-//             {!Count ? (
+
+//         <div className="flex items-center gap-2">
+//           {count === 0 ? (
+//             <img
+//               src={assets.add_icon_white}
+//               alt="add"
+//               onClick={increment}
+//               className={`cursor-pointer ${
+//                 loading && "opacity-50 pointer-events-none"
+//               }`}
+//             />
+//           ) : (
+//             <div className="flex items-center gap-2">
 //               <img
-//                 src={assets.add_icon_white}
-//                 onClick={() => addToCart(item.idMeal)}
-//                 className="cursor-pointer"
+//                 src={assets.remove_icon_red}
+//                 alt="remove"
+//                 onClick={decrement}
+//                 className={`cursor-pointer ${
+//                   loading && "opacity-50 pointer-events-none"
+//                 }`}
 //               />
-//             ) : (
-//               <div className="flex items-center gap-2">
-//                 <img
-//                   src={assets.remove_icon_red}
-//                   onClick={() => removeFromCart(item.idMeal)}
-//                   className="cursor-pointer"
-//                 />
-//                 <p>{Count}</p>
-//                 <img
-//                   src={assets.add_icon_green}
-//                   onClick={() => addToCart(item.idMeal)}
-//                   className="cursor-pointer"
-//                 />
-//               </div>
-//             )}
-//           </div>
+//               <p>{count}</p>
+//               <img
+//                 src={assets.add_icon_green}
+//                 alt="add"
+//                 onClick={increment}
+//                 className={`cursor-pointer ${
+//                   loading && "opacity-50 pointer-events-none"
+//                 }`}
+//               />
+//             </div>
+//           )}
 //         </div>
 //       </div>
 //     </div>
 //   );
-// };
-// export default FoodCard;
+// }
 
+import { useMemo, useState } from "react";
 import { assets } from "../assets/assets";
-import { useCart } from "../Context/CartContext";
-import { useFood } from "../Context/FoodContext";
+import { useAuth } from "../Context/AuthContext";
+import toast from "react-hot-toast";
 
-const FoodCard = ({ item, openModal }) => {
-  const { cartItems, addToCart, removeFromCart } = useCart();
-  const { getFullMeal } = useFood();
+export default function FoodCard({
+  food,
+  openModal,
+  cartItems,
+  addToCart,
+  removeFromCart,
+}) {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
 
-  const cartItem = cartItems[item.idMeal];
-  const count = cartItem?.quantity || 0;
+  const rating = useMemo(() => (Math.random() * 2.5 + 2.5).toFixed(1), []);
 
-  const handleAddToCart = async () => {
-    const fullMeal = await getFullMeal(item.idMeal);
-    if (fullMeal) {
-      addToCart(fullMeal);
+  const foodId = food._id || food.food?._id;
+  const count = cartItems?.[foodId]?.quantity || 0;
+
+  const increment = async () => {
+    if (!user) {
+      toast.error("Please login first");
+      return;
+    }
+
+    if (!addToCart) {
+      console.error("addToCart function missing in props");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await addToCart(food);
+    } catch (err) {
+      toast.error("Failed to add item");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const decrement = async () => {
+    if (count === 0) return;
+
+    if (!removeFromCart) {
+      console.error("removeFromCart function missing in props");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await removeFromCart(foodId);
+    } catch (err) {
+      toast.error("Failed to remove item");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="p-3 shadow hover:scale-105 transition cursor-pointer rounded-xl">
+    <div className="p-3 shadow hover:scale-105 transition rounded-xl bg-white">
       <img
-        src={item.strMealThumb}
-        className="w-full h-80 object-cover rounded-xl sm:h-48 lg:h-56"
-        onClick={() => openModal(item.idMeal)}
-        alt={item.strMeal}
+        src={food.image}
+        alt={food.name}
+        className="w-full h-80 object-cover rounded-xl sm:h-48 lg:h-56 cursor-pointer"
+        onClick={openModal}
       />
 
-      <div className="w-full px-4 py-4 flex justify-between items-center md:px-8">
+      <div className="flex justify-between items-center mt-4 px-2">
         <div>
-          <h2 className="font-medium text-xl mt-2 sm:text-base">
-            {item.strMeal}
-          </h2>
-          <p className="text-sm">
-            ⭐ {(Math.floor(Math.random() * 9) + 2) / 2}
-          </p>
+          <h2 className="font-medium text-lg">{food.name}</h2>
+          <p className="text-sm">⭐ {rating}</p>
+          <span className="text-green-600 font-semibold">₹{food.price}</span>
         </div>
 
         <div className="flex items-center gap-2">
-          {!count ? (
+          {count === 0 ? (
             <img
               src={assets.add_icon_white}
-              onClick={handleAddToCart}
-              className="cursor-pointer"
               alt="add"
+              onClick={increment}
+              className={`cursor-pointer ${loading && "opacity-50 pointer-events-none"}`}
             />
           ) : (
             <div className="flex items-center gap-2">
               <img
                 src={assets.remove_icon_red}
-                onClick={() => removeFromCart(item.idMeal)}
-                className="cursor-pointer"
                 alt="remove"
+                onClick={decrement}
+                className={`cursor-pointer ${loading && "opacity-50 pointer-events-none"}`}
               />
-              <p>{count}</p>
+              <p className="font-semibold">{count}</p>
               <img
                 src={assets.add_icon_green}
-                onClick={handleAddToCart}
-                className="cursor-pointer"
                 alt="add"
+                onClick={increment}
+                className={`cursor-pointer ${loading && "opacity-50 pointer-events-none"}`}
               />
             </div>
           )}
@@ -119,6 +199,4 @@ const FoodCard = ({ item, openModal }) => {
       </div>
     </div>
   );
-};
-
-export default FoodCard;
+}
