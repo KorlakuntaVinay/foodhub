@@ -229,7 +229,7 @@ const Navbar = () => {
 
   const linkClass = ({ isActive }) =>
     `cursor-pointer pb-1 ${
-      isActive ? "text-black border-b-2 border-orange-500" : "text-gray-500"
+      isActive ? "text-black  border-orange-500" : "text-gray-500"
     }`;
 
   return (

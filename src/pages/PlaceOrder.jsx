@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
-// import { useCart } from "../Context/CartContext";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import toast from "react-hot-toast";
 import { orderData } from "../services/placeOrderapi";
 import axios from "axios";
 const PlaceOrder = () => {
-  // const { cartItems } = useCart();
   const { user, token } = useAuth();
-  const [cartdata, setCartData] = useState({});
+  const [cartdata, setCartData] = useState([]);
+  const navigate = useNavigate();
 
   const fetchCart = async () => {
     try {
@@ -21,7 +21,8 @@ const PlaceOrder = () => {
         },
       );
       // console.log("data:", res.data);
-
+      console.log(user);
+      console.log(" User ID:", user?.id);
       setCartData(res.data.items);
     } catch (err) {
       console.error("Failed to fetch cart:", err);
@@ -56,8 +57,8 @@ const PlaceOrder = () => {
   };
   const datasubmit = async (e) => {
     e.preventDefault();
-    console.log(" Submit clicked");
-    console.log(" Form Data:", formdata);
+    // console.log(" Submit clicked");
+    // console.log(" Form Data:", formdata);
 
     if (!user?.id || !token) {
       toast.error("User not logged in");
@@ -69,12 +70,7 @@ const PlaceOrder = () => {
       toast.error("Fill All Address Fields");
       return;
     }
-    // try {
-    //   await datasubmit();
-    // } catch (err) {
-    //   console.error("Data is missing", err);
-    //   toast.error("some fields are missing");
-    // }
+
     const deliveryAddress = `${street},${city},${state},${pin_code},${country},${phone}`;
     console.log(" Order payload:", {
       userId: user.id,
@@ -85,20 +81,11 @@ const PlaceOrder = () => {
       deliveryAddress,
     };
 
-    // const OrderPlace = async (deliveryAddress) => {
-    // if (!user?.id || !token) {
-    //   toast.error("Please use valid userID");
-    //   return;
-    // }
-    // const userId = user?.id;
-    // if (!deliveryAddress) {
-    //   toast.error("Add delivery Address");
-    //   return;
-    // }
     try {
       const response = await orderData(orderPayload, token);
       console.log("Order placed ", response.data);
       toast.success("Order placed");
+      navigate(`/createorder`);
     } catch (err) {
       console.error("Place order failed", err.response?.data || err.message);
       toast.error("Failed to place oder");
@@ -107,7 +94,8 @@ const PlaceOrder = () => {
 
   return (
     <form className="  w-[80%] mx-auto px-4 py-8 mt-10 flex justify-between gap-14 items-center">
-      <div className="w-[45%]">
+      <div className="w-[10%]"></div>
+      <div className="w-[60%]">
         <h2 className="text-2xl font-semibold  mb-6">Delivery Information</h2>
         {/* <div className="grid grid-cols-2 gap-4 mb-4">
           <input
@@ -179,34 +167,7 @@ const PlaceOrder = () => {
           Place Order
         </button>
       </div>
-
-      <div className="w-[45%]">
-        <div className="p-6 rounded-xl ">
-          <h2 className="text-xl font-semibold mb-6">Cart Totals</h2>
-
-          <div className="flex justify-between pb-3  mb-3">
-            <span className="text-gray-600">Subtotal</span>
-            <span>₹{subtotal}</span>
-          </div>
-
-          <div className="flex justify-between pb-3  mb-3">
-            <span className="text-gray-600">Delivery Fee</span>
-            <span>₹30</span>
-          </div>
-
-          <div className="flex justify-between font-semibold text-lg mt-4">
-            <span>Total</span>
-            <span>₹{subtotal + 30}</span>
-          </div>
-
-          <button
-            type="submit"
-            className="mt-6 w-full bg-orange-500 text-white py-3 rounded-md font-semibold"
-          >
-            PROCEED TO PAYMENT
-          </button>
-        </div>
-      </div>
+      <div className="w-[10%]"></div>
     </form>
   );
 };

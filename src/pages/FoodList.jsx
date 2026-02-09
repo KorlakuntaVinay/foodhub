@@ -242,6 +242,44 @@ export default function FoodList() {
       toast.error("Failed to remove item");
     }
   };
+  // const handleQuantity = async (foodId, type) => {
+  //   if (!isAuthenticated || !token) {
+  //     toast.error("Please log in first");
+  //     return;
+  //   }
+
+  //   try {
+  //     await updateCartQuantity({ foodId, type }, token);
+
+  //     // ✅ update UI optimistically
+  //     setCartItems((prev) => {
+  //       const updated = { ...prev };
+
+  //       if (type === "increase") {
+  //         updated[foodId] = {
+  //           ...(updated[foodId] || {}),
+  //           quantity: (updated[foodId]?.quantity || 0) + 1,
+  //         };
+  //       }
+
+  //       if (type === "decrease") {
+  //         if (updated[foodId]?.quantity <= 1) {
+  //           delete updated[foodId];
+  //         } else {
+  //           updated[foodId] = {
+  //             ...updated[foodId],
+  //             quantity: updated[foodId].quantity - 1,
+  //           };
+  //         }
+  //       }
+
+  //       return updated;
+  //     });
+  //   } catch (err) {
+  //     console.error("Quantity update failed:", err);
+  //     toast.error("Failed to update cart");
+  //   }
+  // };
 
   /* ================= FILTER + SORT ================= */
   const filteredAndSortedFoods = useMemo(() => {

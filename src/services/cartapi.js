@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// const BASE_URL = "https://food-backend-wb32.onrender.com/api/cart";
 const BASE_URL = "https://food-backend-wb32.onrender.com/api/cart";
 // const BASE_URL = "https://food-mangement-task.onrender.com/api/cart/add";
 
@@ -49,3 +50,10 @@ export const clearCart = (token) => {
     },
   });
 };
+export const updateCartQuantity = (data, token) =>
+  axios.put(`${BASE_URL}/quantity`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });

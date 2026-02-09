@@ -8,13 +8,14 @@ import toast from "react-hot-toast";
 import {
   clearCart as clearCartAPI,
   removeCartItem as removeCartAPI,
+  updateCartQuantity,
 } from "../services/cartapi";
 
 const Cart = () => {
   const { user, token, isAuthenticated } = useAuth();
   // const { cartitems, removeFromCart, clearCart } = useCart();
 
-  const [cartdata, setCartData] = useState({});
+  const [cartdata, setCartData] = useState([]);
   const fetchCart = async () => {
     try {
       const res = await axios.get(
@@ -27,7 +28,7 @@ const Cart = () => {
       );
       console.log("data:", res.data);
       // console.log("cart data", res.data.items);
-      setCartData(res.data.items);
+      setCartData(res.data.items || []);
     } catch (err) {
       console.error("Failed to fetch cart:", err);
     }
@@ -80,12 +81,88 @@ const Cart = () => {
       toast.error("Failed to remove item");
     }
   };
+  // const handleQuantity = async (foodId, type) => {
+  //   if (!isAuthenticated || !token) {
+  //     toast.error("Please login first");
+  //     return;
+  //   }
+
+  //   try {
+  //     await updateCartQuantity({ foodId, type }, token);
+
+  //     //  Optimistic UI update
+  //     setCartData((prev) => {
+  //       const updated = { ...prev };
+
+  //       if (!updated[foodId]) return prev;
+
+  //       if (type === "increase") {
+  //         updated[foodId].quantity += 1;
+  //       }
+
+  //       if (type === "decrease") {
+  //         if (updated[foodId].quantity <= 1) {
+  //           delete updated[foodId];
+  //         } else {
+  //           updated[foodId].quantity -= 1;
+  //         }
+  //       }
+
+  //       return updated;
+  //     });
+  //   } catch (err) {
+  //     console.error("Quantity update failed:", err);
+  //     toast.error("Failed to update quantity");
+  //   }
+  // };
+  const handleQuantity = async (foodId, type) => {
+    if (!isAuthenticated || !token) {
+      toast.error("Please login first");
+      return;
+    }
+
+    setCartData((prev) =>
+      prev.map((item) =>
+        item.foodId === foodId
+          ? {
+              ...item,
+              quantity:
+                type === "increase"
+                  ? item.quantity + 1
+                  : Math.max(1, item.quantity - 1),
+            }
+          : item,
+      ),
+    );
+    toast.success(
+      type === "increase" ? "Quantity increased" : "Quantity decreased",
+      { duration: 800 },
+    );
+    try {
+      await updateCartQuantity({ foodId, type }, token);
+    } catch (err) {
+      setCartData((prev) =>
+        prev.map((item) =>
+          item.foodId === foodId
+            ? {
+                ...item,
+                quantity:
+                  type === "increase" ? item.quantity - 1 : item.quantity + 1,
+              }
+            : item,
+        ),
+      );
+
+      toast.error("Failed to update quantity");
+    }
+  };
 
   const items = Object.values(cartdata || {});
   const subtotal = items.reduce(
     (acc, food) => acc + food.quantity * food.price,
     0,
   );
+
   // const handlegetdata = async () => {
   //   const res = await axios.get(
   //     `https://food-backend-wb32.onrender.com/api/foods${getFoodImage}`,
@@ -122,7 +199,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="relative w-[96%] mx-auto mt-6 rounded-xl min-h-screen bg-white p-4 z-50">
+    <div className="relative w-[96%] mx-auto mt-6 rounded-xl min-h-screen bg-white p-4 -z-10">
       <div>
         <div className="grid grid-cols-7 font-semibold pb-2 text-black">
           <p>Item</p>
@@ -150,7 +227,25 @@ const Cart = () => {
 
             <p>₹{food.price}</p>
 
-            <p>{food.quantity}</p>
+            {/* <p>{food.quantity}</p> */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleQuantity(food.foodId, "decrease")}
+                disabled={food.quantity === 1}
+                className="px-2 bg-red-200 rounded"
+              >
+                -
+              </button>
+
+              <span>{food.quantity}</span>
+
+              <button
+                onClick={() => handleQuantity(food.foodId, "increase")}
+                className="px-2 bg-green-200 rounded"
+              >
+                +
+              </button>
+            </div>
 
             <p>₹{food.price * food.quantity}</p>
 

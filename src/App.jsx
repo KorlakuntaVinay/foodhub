@@ -12,6 +12,8 @@ import AdminUsers from "./pages/adminusers";
 import AdminRoute from "./routes/AdminRoute";
 import AdminDashboard from "./pages/AdminDashboard";
 import ErrorBoundary from "./components/ErrorBoundary";
+import CreateOrder from "./pages/CreateOrder";
+import Payment from "./pages/Payment";
 
 import { useDispatch } from "react-redux";
 import Cart from "./pages/cart";
@@ -35,7 +37,8 @@ function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/placeorder" element={<PlaceOrder />} />
-
+          <Route path="/createorder" element={<CreateOrder />} />
+          <Route path="/paym" element={<Payment />} />
           <Route path="/" element={<Home />} />
           <Route
             path="/:userId/foodlist"

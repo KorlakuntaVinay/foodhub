@@ -2,10 +2,12 @@ import React from "react";
 import header_img from "../assets/header_img.png";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
-const Home = ({ setShowLogin }) => {
+const Home = ({}) => {
   const { user } = useAuth();
-
+  const navigate = useNavigate();
   return (
     <div>
       <div
@@ -38,15 +40,27 @@ const Home = ({ setShowLogin }) => {
             experience, one delicious meal at a time.
           </p>
 
-          <NavLink
-            to={user ? "/foodlist" : "#"}
+          {/* <NavLink
+            to={user ? "/:userId/foodlist" : "#"}
             onClick={(e) => {
               if (!user) {
                 e.preventDefault();
-                setShowLogin(true);
               }
             }}
-            className="inline-block mt-5 bg-amber-50 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-black font-medium hover:bg-amber-300 transition"
+            className="inline-block mt-5 bg-amber-50 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full  text-black font-medium hover:bg-amber-300 transition"
+          >
+            View Menu
+          </NavLink> */}
+          <NavLink
+            to={user ? "/:userId/foodlist" : "#"}
+            // className="cursor-pointer"
+            onClick={(e) => {
+              if (!user) {
+                e.preventDefault();
+                alert("Please sign in");
+              }
+            }}
+            className="mt-5 bg-amber-50 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-black font-medium hover:bg-amber-300 transition"
           >
             View Menu
           </NavLink>
