@@ -18,6 +18,7 @@ import Payment from "./pages/Payment";
 import { useDispatch } from "react-redux";
 import Cart from "./pages/cart";
 import PlaceOrder from "./pages/PlaceOrder";
+import PaymentPage from "./pages/pay";
 function App() {
   const dispatch = useDispatch();
   const data = [
@@ -39,6 +40,7 @@ function App() {
           <Route path="/placeorder" element={<PlaceOrder />} />
           <Route path="/createorder" element={<CreateOrder />} />
           <Route path="/paym" element={<Payment />} />
+          <Route path="/pay" element={<PaymentPage />} />
           <Route path="/" element={<Home />} />
           <Route
             path="/:userId/foodlist"

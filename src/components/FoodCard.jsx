@@ -101,6 +101,7 @@ import { useAuth } from "../Context/AuthContext";
 import toast from "react-hot-toast";
 import { updateCartQuantity } from "../services/cartapi";
 import axios from "axios";
+// import add_icon_white
 export default function FoodCard({
   food,
   openModal,

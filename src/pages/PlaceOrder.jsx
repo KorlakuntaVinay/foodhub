@@ -96,6 +96,12 @@ const PlaceOrder = () => {
     <form className="  w-[80%] mx-auto px-4 py-8 mt-10 flex justify-between gap-14 items-center">
       <div className="w-[10%]"></div>
       <div className="w-[60%]">
+        <button
+          onClick={() => navigate("/cart")}
+          className=" top-4 left-4 z-50 flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-md"
+        >
+          ← Back to Cart
+        </button>
         <h2 className="text-2xl font-semibold  mb-6">Delivery Information</h2>
         {/* <div className="grid grid-cols-2 gap-4 mb-4">
           <input
